@@ -27,12 +27,15 @@ ostream& zich::operator<<(std::ostream& output, const Matrix& mat){
     for(size_t i = 0; i<mat.rows; i++){
         string row;
         for(size_t j = 0; j<mat.cols; j++){
-            row += to_string(mat.get(i,j));
+            row += to_string((int)mat.get(i,j));
             if(j < mat.cols-1){
                 row.push_back(' ');
             }
         }
-        output << "[" << row << "]" << endl;
+        output << "[" << row << "]";
+        if(i<mat.rows-1){
+            output << endl;
+        }
     }
     return output;
 }
@@ -49,29 +52,11 @@ istream& zich::operator>>(std::istream& input, Matrix& mat){
         size_t j=0;
         double newVal; 
         char c;
-        if(c != '\n'){
-            input >> c;
-            if (c == ','){
-                input >> c;
-            }
-        }
-        while(j < newCols && input.peek() != ']' && c != '\n'){
+        
+        while(j < newCols && input.peek() != ']'){
             input >> newVal;
             newRow.push_back(newVal);
             j++;
-        }
-        while(j < newCols){
-            newRow.push_back(0);
-            j++;
-        }
-        //get rid of the rest of the input
-        while(c != ']' && c != '\n'){
-            input >> c;
-            if(input.peek() == '\n'){
-                c = '\n';
-            }
-            //cout << (int)c;
-
         }
         newMat.push_back(newRow);
     }

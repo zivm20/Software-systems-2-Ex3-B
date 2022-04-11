@@ -7,6 +7,12 @@
 using namespace zich;
 using namespace std;
 vector<vector<double>> Matrix::genMatrix(const vector<double>& vals, int r, int c){
+    if(r*c != vals.size()){
+        throw std::invalid_argument("value count doesn't match given size");
+    }
+    if(r < 0 || c < 0){
+        throw std::invalid_argument("rows and columns must be positive");
+    }
     vector<vector<double>> mat;
     for(size_t i = 0; i < r; i++){
         vector<double> row;
@@ -20,7 +26,7 @@ vector<vector<double>> Matrix::genMatrix(const vector<double>& vals, int r, int 
 
 Matrix::Matrix(const std::vector<double>& vals, int r, int c): matrix(genMatrix(vals,r,c)), rows(r), cols(c){
 }
-Matrix::Matrix(): matrix(), rows(0), cols(0){
+Matrix::Matrix(): rows(0), cols(0){
 }
 
 ostream& zich::operator<<(std::ostream& output, const Matrix& mat){
@@ -51,9 +57,9 @@ istream& zich::operator>>(std::istream& input, Matrix& mat){
     istringstream input_vars{row};
     while(getline(input_vars,row,',')){
         vector<double> newRow;
-        //only case where we allo no ' ' before the '[' is for the first row
+        //only case where we allow no ' ' before the '[' is for the first row
         if(row[0] != ' ' && rowCount>0){
-            throw std::invalid_argument("Invalid input format 1");
+            throw std::invalid_argument("Invalid input format");
         }
         //get rid of leading ' '
         if(row[0] == ' '){
@@ -61,13 +67,12 @@ istream& zich::operator>>(std::istream& input, Matrix& mat){
         }
         //matrix rows should have atleast 1 character
         if(row.length()<3 && row[0] != '[' && row[row.length() - 1] != ']'){
-            throw std::invalid_argument("Invalid input format 2");
+            throw std::invalid_argument("Invalid input format");
         }
         //remove the ' ', '[' and ']' chars from the string
         row = row.substr(1,row.length()-2);
         //adding the ' ' at the end will make the process of building the row easier
         string numStr;
-        size_t num_end;
         size_t cols=0;
         istringstream row_stream{row};
         while(getline(row_stream,numStr,' ')){

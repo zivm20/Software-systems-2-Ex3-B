@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
-
+#include <sstream>
 using namespace zich;
 using namespace std;
 vector<vector<double>> Matrix::genMatrix(const vector<double>& vals, int r, int c){
@@ -40,28 +40,60 @@ ostream& zich::operator<<(std::ostream& output, const Matrix& mat){
     return output;
 }
 istream& zich::operator>>(std::istream& input, Matrix& mat){
-    int newRows;
-    int newCols;
-    cout<<"Rows; ";
-    input>>newRows;
-    cout<<"Cols; ";
-    input>>newCols;
+    
+    string row;
+    size_t colCount=0;
+    size_t rowCount = 0;
     vector<vector<double>> newMat;
-    for(size_t i = 0; i < newRows; i++){
+    //read until first line break
+    getline(input,row);
+    //use this new string as our input string
+    istringstream input_vars{row};
+    while(getline(input_vars,row,',')){
         vector<double> newRow;
-        size_t j=0;
-        double newVal; 
-        char c;
-        
-        while(j < newCols && input.peek() != ']'){
-            input >> newVal;
-            newRow.push_back(newVal);
-            j++;
+        //only case where we allo no ' ' before the '[' is for the first row
+        if(row[0] != ' ' && rowCount>0){
+            throw std::invalid_argument("Invalid input format 1");
         }
+        //get rid of leading ' '
+        if(row[0] == ' '){
+            row = row.substr(1,row.length()-1);
+        }
+        //matrix rows should have atleast 1 character
+        if(row.length()<3 && row[0] != '[' && row[row.length() - 1] != ']'){
+            throw std::invalid_argument("Invalid input format 2");
+        }
+        //remove the ' ', '[' and ']' chars from the string
+        row = row.substr(1,row.length()-2);
+        //adding the ' ' at the end will make the process of building the row easier
+        string numStr;
+        size_t num_end;
+        size_t cols=0;
+        istringstream row_stream{row};
+        while(getline(row_stream,numStr,' ')){
+            
+            //make sure the number is made of only digits
+            for(char const & c: numStr){
+                if(isdigit(c) == 0){
+                    throw std::invalid_argument("Invalid input format");
+                }
+            }
+            //will also throw an error if we still get an invalid character
+            newRow.push_back(stod(numStr));
+            cols++;
+        }
+        //different amount of columns in each row
+        if(rowCount>0 && colCount != cols){
+            throw std::invalid_argument("Invalid input format");
+        }
+        rowCount++;
+        colCount = cols;
         newMat.push_back(newRow);
     }
-    mat.cols = newCols;
-    mat.rows = newRows;
+    
+    
+    mat.cols = colCount;
+    mat.rows = rowCount;
     mat.matrix = newMat;
     return input;
 }

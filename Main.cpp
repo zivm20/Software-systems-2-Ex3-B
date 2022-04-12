@@ -28,6 +28,7 @@ void print(string key, Matrix value){
 void print(Matrix value){
     cout << value << endl << endl;
 }
+//process equation recursively
 Matrix process_eq(string eq, map<string,Matrix>& mats){
     if(mats.find(eq) != mats.end()){
         return mats.at(eq);
@@ -61,7 +62,6 @@ Matrix process_eq(string eq, map<string,Matrix>& mats){
         return mat1-mat2;
     }
     if((args = split(eq,"*")).size()>1){
-        
         string var1;
         for(char const & c: args[0]){
             if(isdigit(c) == 0){
@@ -90,6 +90,8 @@ Matrix process_eq(string eq, map<string,Matrix>& mats){
             //could have a raw mat as input
             mat = process_eq(args[0],mats);
             string new_eq = args[1].substr(var2.length());
+            //since var 2 might be the last var, we will swich between mat and var2
+            //for simplicity sake
             return process_eq(var2 + "*" + args[0] + new_eq,mats);
             
         }
@@ -100,8 +102,6 @@ Matrix process_eq(string eq, map<string,Matrix>& mats){
                 }
                 var2+=c;
             }
-            //get the following matrix
-            //mat = process_eq(var2,mats);
             return stod(var1)*process_eq(args[1],mats);
         }
         mat = process_eq(args[0],mats);
@@ -114,6 +114,7 @@ Matrix process_eq(string eq, map<string,Matrix>& mats){
     newMatStream>>mat;
     return mat;
 }
+//save matrices to file
 void save(string f, map<string,Matrix> mats){
     fstream file(f,ios::trunc|ios::out);
     if(file.is_open()){
@@ -135,6 +136,7 @@ void save(string f, map<string,Matrix> mats){
         }
     }
 }
+//load matrices from file
 map<string,Matrix> load(string f){
     map<string,Matrix> mats;
     fstream file(f,ios::in);
@@ -164,9 +166,18 @@ int main(){
                     print(entry.first,entry.second);
                 }
             }
+            else if(inp == "exit" || inp == "Exit"){
+                break;
+            }
             else{
-                print(process_eq(inp,matrices));
-                save("mats.txt",matrices);
+                try{
+                    print(process_eq(inp,matrices));
+                    save("mats.txt",matrices);
+                }
+                catch(const exception&){
+                    cout<<"command error"<<endl;
+                }
+                
             }
         }
     }

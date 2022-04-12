@@ -59,6 +59,7 @@ istream& zich::operator>>(std::istream& input, Matrix& mat){
         vector<double> newRow;
         //only case where we allow no ' ' before the '[' is for the first row
         if(row[0] != ' ' && rowCount>0){
+            
             throw std::invalid_argument("Invalid input format");
         }
         //get rid of leading ' '
@@ -67,6 +68,7 @@ istream& zich::operator>>(std::istream& input, Matrix& mat){
         }
         //matrix rows should have atleast 1 character
         if(row.length()<3 && row[0] != '[' && row[row.length() - 1] != ']'){
+            
             throw std::invalid_argument("Invalid input format");
         }
         //remove the ' ', '[' and ']' chars from the string
@@ -79,7 +81,8 @@ istream& zich::operator>>(std::istream& input, Matrix& mat){
             
             //make sure the number is made of only digits
             for(char const & c: numStr){
-                if(isdigit(c) == 0){
+                if(isdigit(c) == 0 && c!='-'){
+                    
                     throw std::invalid_argument("Invalid input format");
                 }
             }
@@ -89,6 +92,7 @@ istream& zich::operator>>(std::istream& input, Matrix& mat){
         }
         //different amount of columns in each row
         if(rowCount>0 && colCount != cols){
+            
             throw std::invalid_argument("Invalid input format");
         }
         rowCount++;

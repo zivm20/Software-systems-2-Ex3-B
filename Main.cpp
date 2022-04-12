@@ -56,9 +56,14 @@ Matrix process_eq(string eq, map<string,Matrix>& mats){
         Matrix mat2 = process_eq(args[1],mats);
         return mat1+mat2;
     }
-    if((args = split(eq,"-")).size()>1){
-        Matrix mat1 = process_eq(args[0],mats);
+    //extra check that we are not detecting minus from within raw matrix
+    if((args = split(eq,"-")).size()>1 && args[0][args[0].length()-1]!=' ' && args[0][args[0].length()-1]!='['){
         Matrix mat2 = process_eq(args[1],mats);
+        //unary minus
+        if(args[0].size()<1){
+            return -mat2;
+        }
+        Matrix mat1 = process_eq(args[0],mats);
         return mat1-mat2;
     }
     if((args = split(eq,"*")).size()>1){
@@ -96,19 +101,11 @@ Matrix process_eq(string eq, map<string,Matrix>& mats){
             
         }
         else if(var2.length()==0 && var1.length()>0){
-            for(char const & c: args[1]){
-                if(c=='-' || c=='+' || c=='=' || c=='>' || c=='<' || c=='*'){
-                    break;
-                }
-                var2+=c;
-            }
             return stod(var1)*process_eq(args[1],mats);
         }
         mat = process_eq(args[0],mats);
         return mat*process_eq(args[1],mats);
     }
-    
-    cout<<eq<<endl;
     istringstream newMatStream{eq};
     Matrix mat;
     newMatStream>>mat;

@@ -73,33 +73,22 @@ istream& zich::operator>>(std::istream& input, Matrix& mat){
         }
         //remove the ' ', '[' and ']' chars from the string
         row = row.substr(1,row.length()-2);
-        //adding the ' ' at the end will make the process of building the row easier
         string numStr;
         size_t cols=0;
         istringstream row_stream{row};
         while(getline(row_stream,numStr,' ')){
-            
-            //make sure the number is made of only digits
-            for(char const & c: numStr){
-                if(isdigit(c) == 0 && c!='-'){
-                    
-                    throw std::invalid_argument("Invalid input format");
-                }
-            }
-            //will also throw an error if we still get an invalid character
+            //will an error if we have a string that isn't a number
             newRow.push_back(stod(numStr));
             cols++;
         }
         //different amount of columns in each row
         if(rowCount>0 && colCount != cols){
-            
             throw std::invalid_argument("Invalid input format");
         }
         rowCount++;
         colCount = cols;
         newMat.push_back(newRow);
     }
-    
     
     mat.cols = colCount;
     mat.rows = rowCount;
